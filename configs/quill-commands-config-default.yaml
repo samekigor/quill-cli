@@ -1,0 +1,72 @@
+config:
+  core:
+   - config:
+      name: "config"
+      short: "Modify Quill configuration."
+      long: "This command allows you to modify the Quill configuration settings, including paths and other core settings."
+  subcommands:
+    - daemon:
+        name: "daemon"
+        short: "Modify daemon configuration file."
+        long: "This command allows you to modify the Quill daemon configuration file, including setting and getting the path to the Quill daemon executable."
+        flags:
+          - name: "get-path"
+            shortcut: "gp"
+            description: "Show the current path to the Quill daemon config file."
+          - name: "set-path"
+            shortcut: "sp"
+            description: "Set the path to the Quill daemon config file."
+          - name: "set-default"
+            shortcut: "sd"
+            description: "Set the Quill daemon config file to the default path."
+    - commands:
+        name: "commands"
+        short: "Modify commands configuration file."
+        long: "This command allows you to modify the Quill commands configuration file."
+        flags:
+          - name: "get-path"
+            shortcut: "gp"
+            description: "Show the current path to the Quill commands config file."
+          - name: "set-path"
+            shortcut: "sp"
+            description: "Set the path to the Quill commands config file."
+          - name: "set-default"
+            shortcut: "sd"
+            description: "Set the Quill commands config file to the default path."
+auths:
+  core:
+    - login:
+        name: "login"
+        short: "Login to your chosen registry."
+        long: "This command allows you to login to your chosen registry."
+        flags:
+          - name: "username"
+            shortcut: "u"
+            description: "The username to use for authentication."
+          - name: "password"
+            shortcut: "p"
+            description: "The password to use for authentication."
+          - name: "registry"
+            shortcut: "r"
+            description: "URL of the registry to login to."          
+    - logout:
+        name: "logout"
+        short: "Logout of your chosen registry."
+        long: "This command allows you to logout of your chosen registry."
+        flags:
+          - name: "registry"
+            shortcut: "r"
+            description: "URL of the registry to logout of."
+            
+
+
+
+
+
+
+
+
+
+    
+
+
