@@ -24,13 +24,16 @@ config:
         short: "Modify commands configuration file."
         long: "This command allows you to modify the Quill commands configuration file."
         flags:
-          - name: "get-path"
+          get-path:
+            name: "get-path"
             shortcut: "gp"
             description: "Show the current path to the Quill commands config file."
-          - name: "set-path"
+          set-path:
+            name: "set-path"
             shortcut: "sp"
             description: "Set the path to the Quill commands config file."
-          - name: "set-default"
+          set-default:
+            name: "set-default"
             shortcut: "sd"
             description: "Set the Quill commands config file to the default path."
 auths:
@@ -58,15 +61,3 @@ auths:
             shortcut: "r"
             description: "URL of the registry to logout of."
             
-
-
-
-
-
-
-
-
-
-    
-
-
