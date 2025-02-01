@@ -40,7 +40,7 @@ func login(cmd *cobra.Command, args []string) {
 	msg, err := credentials.LoginToRegistry(timeout)
 
 	if err != nil {
-		cmd.PrintErrln("Error: %v, Message from daemon: %v", err, msg)
+		cmd.PrintErrf("Error: %v, Message from daemon: %v\n", err, msg)
 		return
 	}
 	cmd.Print(msg)
