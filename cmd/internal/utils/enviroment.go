@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/spf13/viper"
 )
@@ -13,10 +13,10 @@ func InitEnviromentVariables() {
 	viper.SetEnvPrefix(PrefixEnviromentVariables)
 }
 
-func GetEnviromentVariable(name string) string {
-	envVar := viper.GetString(name)
+func GetEnviromentVariable(name string) (envVar string, err error) {
+	envVar = viper.GetString(name)
 	if envVar == "" {
-		log.Fatalf("Failure with reading enviroment variable: %v", name)
+		return "", fmt.Errorf("failure with reading environment variable: %s", name)
 	}
-	return envVar
+	return envVar, nil
 }

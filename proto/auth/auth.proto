@@ -1,0 +1,30 @@
+syntax = "proto3";
+package auth;
+
+option go_package = "github.com/samekigor/quill-cli/proto/auth";
+
+service Auth {
+    rpc LoginToRegistry(LoginRequest) returns (LoginStatus) {}
+    rpc LogoutFromRegistry(LogoutRequest) returns (LogoutStatus) {}
+}
+
+message LoginRequest {
+    string registry = 1;
+    string username = 2;
+}
+
+message LoginStatus {
+    bool isSuccess = 1;
+    string message = 2;
+}
+
+message LogoutRequest {
+    string registry = 1;
+    string username = 2;
+}
+
+message LogoutStatus{
+    bool isSuccess = 1;
+    string message = 2;
+
+}

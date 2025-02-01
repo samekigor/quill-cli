@@ -3,14 +3,13 @@ package auths
 import (
 	"context"
 	"log"
+	"time"
 
-	"github.com/zalando/go-keyring"
-	// "golang.org/x/term"
+	"github.com/samekigor/quill-cli/cmd/client"
+	"github.com/samekigor/quill-cli/cmd/internal/utils"
+	"github.com/samekigor/quill-cli/proto/auth"
+
 	"github.com/AlecAivazis/survey/v2"
-	"oras.land/oras-go/v2/registry/remote"
-	orasAuth "oras.land/oras-go/v2/registry/remote/auth"
-	// "golang.org/x/term"
-	// ec "github.com/samekigor/quill-cli/cmd/internal/exitcodes"
 )
 
 var service = "quill-cli"
@@ -23,36 +22,56 @@ type RegistryCredits struct {
 	Tag         string
 }
 
-func (rc *RegistryCredits) deleteCredits() {
-	// Delete the credentials in the keyring
-	err := keyring.Delete(service, rc.Username)
-	if err != nil {
-		log.Fatalf("Failed to delete credentials: %v", err)
+// func (rc *RegistryCredits) GetCredentials() (string, string) {
+// 	// Retrieve the credentials from the keyring
+// 	password, err := keyring.Get(service+rc.RegistryUrl, rc.Username)
+// 	if err != nil {
+// 		if err == keyring.ErrNotFound {
+// 			log.Println("Password not found.")
+// 		} else {
+// 			log.Fatalf("Failed to get password: %v", err)
+// 		}
+// 		return "", ""
+// 	}
+// 	log.Println("Credentials retrieved successfully.")
+// 	return rc.Username, password
+// }
+
+func (rc *RegistryCredits) LogoutFromRegistry(timeout int) (msg string, err error) {
+	ctx, cancel := client.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	defer cancel()
+
+	logoutStatus, err := client.GrpcClient.Auth.LogoutFromRegistry(ctx, &auth.LogoutRequest{
+		Registry: rc.RegistryUrl,
+		Username: rc.Username,
+	})
+	if err != nil || !logoutStatus.IsSuccess {
+		return "Failure with logout", err
+	} else {
+		log.Print("Removed credentials in keyring.")
+		return logoutStatus.Message, err
 	}
 }
 
-func (rc *RegistryCredits) saveCredits() {
-	// Store the credentials in the keyring
-	err := keyring.Set(service+rc.RegistryUrl, rc.Username, rc.Password)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Credentials saved successfully.")
-}
+func (rc *RegistryCredits) LoginToRegistry(timeout int) (msg string, err error) {
+	defer func() { rc.Password = "" }()
+	ctx, cancel := client.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	defer cancel()
 
-func (rc *RegistryCredits) GetCredentials() (string, string) {
-	// Retrieve the credentials from the keyring
-	password, err := keyring.Get(service+rc.RegistryUrl, rc.Username)
+	err = utils.SaveCredits(service, rc.Username, rc.Password)
 	if err != nil {
-		if err == keyring.ErrNotFound {
-			log.Println("Password not found.")
-		} else {
-			log.Fatalf("Failed to get password: %v", err)
-		}
-		return "", ""
+		return "Failure with saving password in keyring.", err
 	}
-	log.Println("Credentials retrieved successfully.")
-	return rc.Username, password
+	loginStatus, err := client.GrpcClient.Auth.LoginToRegistry(ctx, &auth.LoginRequest{
+		Registry: rc.RegistryUrl,
+		Username: rc.Username,
+	})
+	if err != nil || loginStatus.IsSuccess {
+		return "Failed to send credentials to daemon.", err
+	} else {
+		return loginStatus.Message, err
+	}
+
 }
 
 func (rc *RegistryCredits) GetPasswordFromUser() {
@@ -62,39 +81,35 @@ func (rc *RegistryCredits) GetPasswordFromUser() {
 	}
 	err := survey.AskOne(prompt, &password)
 	if err != nil {
-		log.Fatalf("Failed to read password: %v", err)
+		log.Printf("Failed to read password: %v", err)
 	}
 	rc.Password = password
 }
 
-func (rc *RegistryCredits) LoginToRegistry() {
-	ctx := context.Background()
+// func (rc *RegistryCredits) LoginToRegistry() error {
+// 	ctx := context.Background()
 
-	remoteRegistry, err := remote.NewRegistry(rc.RegistryUrl)
-	if err != nil {
-		log.Fatalf("Failed to create remote registry: %v", err)
-	}
+// 	remoteRegistry, err := remote.NewRegistry(rc.RegistryUrl)
+// 	if err != nil {
+// 		log.Fatalf("Failed to create remote registry: %v", err)
+// 	}
 
-	remoteRegistry.Client = &orasAuth.Client{
-		Credential: func(ctx context.Context, registry string) (orasAuth.Credential, error) {
-			return orasAuth.Credential{
-				Username: rc.Username,
-				Password: rc.Password,
-			}, nil
-		},
-		Cache: orasAuth.NewCache(),
-	}
+// 	remoteRegistry.Client = &orasAuth.Client{
+// 		Credential: func(ctx context.Context, registry string) (orasAuth.Credential, error) {
+// 			return orasAuth.Credential{
+// 				Username: rc.Username,
+// 				Password: rc.Password,
+// 			}, nil
+// 		},
+// 		Cache: orasAuth.NewCache(),
+// 	}
 
-	err = remoteRegistry.Ping(ctx)
-	if err != nil {
-		log.Fatalf("Failed to ping registry %s: %v", rc.RegistryUrl, err)
-	}
+// 	err = remoteRegistry.Ping(ctx)
+// 	if err != nil {
+// 		log.Fatalf("Failed to ping registry %s: %v", rc.RegistryUrl, err)
+// 	}
+// 	defer func() { rc.Password = "" }()
+// 	rc.saveCredits()
 
-	rc.saveCredits()
-
-	log.Println("Successfully logged into registry:", rc.RegistryUrl)
-}
-
-func (rc *RegistryCredits) LogoutFromRegistry() {
-	rc.deleteCredits()
-}
+// 	log.Println("Successfully logged into registry:", rc.RegistryUrl)
+// }
