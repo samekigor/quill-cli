@@ -11,7 +11,7 @@ var LoginCmd = &cobra.Command{
 	Long: `Login to your chosen registry using your credentials.
 
 	Example:
-	quill auths login --registry <registry> --username <username> --timeout 6`,
+	quill auths login --registry <registry> --username <username> --timeout <integerr>`,
 
 	Run: login,
 }
