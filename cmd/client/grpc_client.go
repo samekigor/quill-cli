@@ -11,8 +11,11 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+const (
+	SocketPath string = "/var/run/quill.sock"
+)
+
 var (
-	SocketPath string
 	GrpcClient *GRPCClient
 )
 

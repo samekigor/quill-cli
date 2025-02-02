@@ -1,7 +1,7 @@
 package auths
 
 import (
-	auth "github.com/samekigor/quill-cli/cmd/internal/auths"
+	auth "github.com/samekigor/quill-cli/internal/auths"
 	"github.com/spf13/cobra"
 )
 
@@ -37,6 +37,6 @@ func logoutFromRegistry(cmd *cobra.Command, args []string) {
 func init() {
 	LogoutCmd.Flags().StringP("registry", "r", "", "Registry URL")
 	LogoutCmd.Flags().StringP("user", "u", "", "Username")
-	LoginCmd.Flags().IntP("timeout", "t", 1, "Timeout [s]")
+	LogoutCmd.Flags().IntP("timeout", "t", 1, "Timeout [s]")
 
 }

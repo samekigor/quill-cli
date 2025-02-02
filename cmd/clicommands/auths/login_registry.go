@@ -1,7 +1,7 @@
 package auths
 
 import (
-	"github.com/samekigor/quill-cli/cmd/internal/auths"
+	"github.com/samekigor/quill-cli/internal/auths"
 	"github.com/spf13/cobra"
 )
 
