@@ -13,19 +13,19 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 )
 
-var service = "quill-cli"
+var service = "quill"
 
 type RegistryCredits struct {
-	RegistryUrl string
-	Username    string
-	Password    string
-	Repository  string
-	Tag         string
+	Registry   string
+	Username   string
+	Password   string
+	Repository string
+	Tag        string
 }
 
 // func (rc *RegistryCredits) GetCredentials() (string, string) {
 // 	// Retrieve the credentials from the keyring
-// 	password, err := keyring.Get(service+rc.RegistryUrl, rc.Username)
+// 	password, err := keyring.Get(service+rc.Registry, rc.Username)
 // 	if err != nil {
 // 		if err == keyring.ErrNotFound {
 // 			log.Println("Password not found.")
@@ -43,7 +43,7 @@ func (rc *RegistryCredits) LogoutFromRegistry(timeout int) (msg string, err erro
 	defer cancel()
 
 	logoutStatus, err := client.GrpcClient.Auth.LogoutFromRegistry(ctx, &auth.LogoutRequest{
-		Registry: rc.RegistryUrl,
+		Registry: rc.Registry,
 		Username: rc.Username,
 	})
 	if err != nil || !logoutStatus.IsSuccess {
@@ -55,16 +55,19 @@ func (rc *RegistryCredits) LogoutFromRegistry(timeout int) (msg string, err erro
 }
 
 func (rc *RegistryCredits) LoginToRegistry(timeout int) (msg string, err error) {
+
+	utils.SaveCredits(service, rc.Registry, rc.Username, rc.Password)
+
 	defer func() { rc.Password = "" }()
 	ctx, cancel := client.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 	defer cancel()
 
-	err = utils.SaveCredits(service, rc.RegistryUrl, rc.Username, rc.Password)
+	err = utils.SaveCredits(service, rc.Registry, rc.Username, rc.Password)
 	if err != nil {
 		return "Failure with saving password in keyring.\n", err
 	}
 	loginStatus, err := client.GrpcClient.Auth.LoginToRegistry(ctx, &auth.LoginRequest{
-		Registry: rc.RegistryUrl,
+		Registry: rc.Registry,
 		Username: rc.Username,
 	})
 	if err != nil || !loginStatus.IsSuccess {
@@ -91,7 +94,7 @@ func (rc *RegistryCredits) GetPasswordFromUser() {
 // func (rc *RegistryCredits) LoginToRegistry() error {
 // 	ctx := context.Background()
 
-// 	remoteRegistry, err := remote.NewRegistry(rc.RegistryUrl)
+// 	remoteRegistry, err := remote.NewRegistry(rc.Registry)
 // 	if err != nil {
 // 		log.Fatalf("Failed to create remote registry: %v", err)
 // 	}
@@ -108,10 +111,10 @@ func (rc *RegistryCredits) GetPasswordFromUser() {
 
 // 	err = remoteRegistry.Ping(ctx)
 // 	if err != nil {
-// 		log.Fatalf("Failed to ping registry %s: %v", rc.RegistryUrl, err)
+// 		log.Fatalf("Failed to ping registry %s: %v", rc.Registry, err)
 // 	}
 // 	defer func() { rc.Password = "" }()
 // 	rc.saveCredits()
 
-// 	log.Println("Successfully logged into registry:", rc.RegistryUrl)
+// 	log.Println("Successfully logged into registry:", rc.Registry)
 // }

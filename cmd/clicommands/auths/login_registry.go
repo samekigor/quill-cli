@@ -27,8 +27,8 @@ func login(cmd *cobra.Command, args []string) {
 	}
 
 	credentials := auths.RegistryCredits{
-		RegistryUrl: passed_registry,
-		Username:    passed_user,
+		Registry: passed_registry,
+		Username: passed_user,
 	}
 	credentials.GetPasswordFromUser()
 
@@ -49,6 +49,6 @@ func login(cmd *cobra.Command, args []string) {
 func init() {
 	LoginCmd.Flags().StringP("registry", "r", "", "Registry URL")
 	LoginCmd.Flags().StringP("user", "u", "", "Username")
-	LoginCmd.Flags().IntP("timeout", "t", 1, "Timeout [s]")
+	LoginCmd.Flags().IntP("timeout", "t", 10, "Timeout [s]")
 
 }

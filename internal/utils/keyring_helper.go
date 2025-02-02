@@ -8,6 +8,7 @@ import (
 
 func SaveCredits(service string, registry string, user string, pwd string) error {
 	key := fmt.Sprintf("%s:%s", registry, user)
+	fmt.Print(key)
 	err := keyring.Set(service, key, pwd)
 	if err != nil {
 		return err

@@ -27,8 +27,8 @@ func logoutFromRegistry(cmd *cobra.Command, args []string) {
 	}
 
 	credentials := auth.RegistryCredits{
-		RegistryUrl: passed_registry,
-		Username:    passed_user,
+		Registry: passed_registry,
+		Username: passed_user,
 	}
 
 	credentials.LogoutFromRegistry(timeout)
@@ -37,6 +37,6 @@ func logoutFromRegistry(cmd *cobra.Command, args []string) {
 func init() {
 	LogoutCmd.Flags().StringP("registry", "r", "", "Registry URL")
 	LogoutCmd.Flags().StringP("user", "u", "", "Username")
-	LogoutCmd.Flags().IntP("timeout", "t", 1, "Timeout [s]")
+	LogoutCmd.Flags().IntP("timeout", "t", 10, "Timeout [s]")
 
 }
