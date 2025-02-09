@@ -36,7 +36,6 @@ func login(cmd *cobra.Command, args []string) {
 		cmd.PrintErrln("Failed to get password")
 		return
 	}
-
 	msg, err := credentials.LoginToRegistry(timeout)
 
 	if err != nil {

@@ -1,12 +1,33 @@
 #!/bin/bash
 
 #
-# This script creates 
+# This script data structure for quill
 #
 
-QUILL_DATA_DICT="/var/lib/quill/"
-# Dir for containers metadata
-CONTAINER
-# mkdir -p $CONTAINER_METADATA
 
-# chown root:root $CONTAINER_METADATA
+# Variables
+GROUP="quill"
+USER=$(whoami)
+
+# Create quill group
+if ! getent group $GROUP > /dev/null; then
+    sudo groupadd $GROUP
+    echo "Grupa $GROUP została utworzona."
+fi
+
+# Add user and root to quill group
+
+sudo usermod -aG $GROUP $USER
+sudo usermod -aG $GROUP root
+
+
+# Credentials file - it stores registry credetials
+
+REGISTRY_CREDITS_FILE_PATH="/etc/quill/credentials.yml"
+
+sudo touch $REGISTRY_CREDITS_FILE_PATH
+sudo chown $USER:$GROUP $REGISTRY_CREDITS_FILE_PATH
+sudo chmod 664 $REGISTRY_CREDITS_FILE_PATH
+sudo chmod -x $REGISTRY_CREDITS_FILE_PATH
+
+#
